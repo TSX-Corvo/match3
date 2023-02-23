@@ -1,7 +1,7 @@
 ## Name: Carlos Bone
 ## ID: 26.451.608
 
-# Assignment 4: Connect-3
+# Assignment 4: Match-3
 
 ## 1.0.0 
 - Initial version
