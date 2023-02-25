@@ -23,6 +23,25 @@ class Tile:
         self.alpha_surface = pygame.Surface(
             (settings.TILE_SIZE, settings.TILE_SIZE), pygame.SRCALPHA
         )
+        self.is_dragged = False
+
+    def update(self):
+        if not self.is_dragged:
+            return
+        
+        board_x = settings.VIRTUAL_WIDTH - 272
+        board_y = 16
+
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        mouse_x = mouse_x * settings.VIRTUAL_WIDTH // settings.WINDOW_WIDTH - board_x
+        mouse_y = mouse_y * settings.VIRTUAL_HEIGHT // settings.WINDOW_HEIGHT - board_y
+
+        if 0 <= mouse_x - settings.TILE_SIZE / 2 < 256 - settings.TILE_SIZE:
+            self.x = mouse_x - settings.TILE_SIZE / 2
+    
+        if 0 <= mouse_y - settings.TILE_SIZE / 2 < 256 - settings.TILE_SIZE:
+            self.y = mouse_y - settings.TILE_SIZE / 2
+
 
     def render(self, surface: pygame.Surface, offset_x: int, offset_y: int) -> None:
         self.alpha_surface.blit(
@@ -42,3 +61,7 @@ class Tile:
             (self.x + offset_x, self.y + offset_y),
             settings.FRAMES["tiles"][self.color][self.variety],
         )
+
+    def restore_position(self):
+        self.x = self.j * settings.TILE_SIZE
+        self.y = self.i * settings.TILE_SIZE

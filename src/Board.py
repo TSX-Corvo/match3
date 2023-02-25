@@ -26,9 +26,18 @@ class Board:
         self.__initialize_tiles()
 
     def render(self, surface: pygame.Surface) -> None:
+        dragged: Tile = None
         for row in self.tiles:
             for tile in row:
+                if tile.is_dragged:
+                    dragged = tile
+                    continue
                 tile.render(surface, self.x, self.y)
+                
+        # The dragged tile needs to be rendered last to appear on top        
+        if dragged:
+            dragged.render(surface, self.x, self.y) 
+            
 
     def __is_match_generated(self, i: int, j: int, color: int) -> bool:
         if (
