@@ -3,6 +3,9 @@
 
 # Assignment 4: Match-3
 
+## 1.1.1
+- Only moves that create matches are allowed
+
 ## 1.1.0
 - Changed tile movement method to dragging
 
