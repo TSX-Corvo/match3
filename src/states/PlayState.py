@@ -168,8 +168,8 @@ class PlayState(BaseState):
 
             self.highlighted_i2 = i
             self.highlighted_j2 = j
-            self.__swap_highlighted_tiles()
             self.highlighted_tile = False
+            self.__swap_highlighted_tiles()
 
 
     def __swap_highlighted_tiles(self) -> None:
@@ -185,13 +185,8 @@ class PlayState(BaseState):
                 self.highlighted_j2
             ]
 
-            def arrive():
-                tile1 = self.board.tiles[self.highlighted_i1][
-                    self.highlighted_j1
-                ]
-                tile2 = self.board.tiles[self.highlighted_i2][
-                    self.highlighted_j2
-                ]
+        
+            def swap_tiles(tile1, tile2) -> None:
                 (
                     self.board.tiles[tile1.i][tile1.j],
                     self.board.tiles[tile2.i][tile2.j],
@@ -205,6 +200,27 @@ class PlayState(BaseState):
                     tile1.i,
                     tile1.j,
                 )
+
+            # Check beforehand if match will be generated
+            swap_tiles(tile1, tile2)
+            mms = self.board.calculate_matches_for([tile1, tile2])
+
+            # Restore the positions after the calculation
+            swap_tiles(tile1, tile2)
+
+            # Only moves that create matches are allowed
+            if mms is None:
+                self.active = True
+                return
+
+            def arrive():
+                tile1 = self.board.tiles[self.highlighted_i1][
+                    self.highlighted_j1
+                ]
+                tile2 = self.board.tiles[self.highlighted_i2][
+                    self.highlighted_j2
+                ]
+                swap_tiles(tile1, tile2)
                 self.__calculate_matches([tile1, tile2])
 
             # Swap tiles
