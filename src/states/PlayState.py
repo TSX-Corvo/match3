@@ -172,6 +172,21 @@ class PlayState(BaseState):
             self.__swap_highlighted_tiles()
 
 
+    def __swap_tiles(self, tile1, tile2) -> None:
+        (
+            self.board.tiles[tile1.i][tile1.j],
+            self.board.tiles[tile2.i][tile2.j],
+        ) = (
+            self.board.tiles[tile2.i][tile2.j],
+            self.board.tiles[tile1.i][tile1.j],
+        )
+        tile1.i, tile1.j, tile2.i, tile2.j = (
+            tile2.i,
+            tile2.j,
+            tile1.i,
+            tile1.j,
+        )
+
     def __swap_highlighted_tiles(self) -> None:
         di = abs(self.highlighted_i2 - self.highlighted_i1)
         dj = abs(self.highlighted_j2 - self.highlighted_j1)
@@ -186,27 +201,12 @@ class PlayState(BaseState):
             ]
 
         
-            def swap_tiles(tile1, tile2) -> None:
-                (
-                    self.board.tiles[tile1.i][tile1.j],
-                    self.board.tiles[tile2.i][tile2.j],
-                ) = (
-                    self.board.tiles[tile2.i][tile2.j],
-                    self.board.tiles[tile1.i][tile1.j],
-                )
-                tile1.i, tile1.j, tile2.i, tile2.j = (
-                    tile2.i,
-                    tile2.j,
-                    tile1.i,
-                    tile1.j,
-                )
-
             # Check beforehand if match will be generated
-            swap_tiles(tile1, tile2)
+            self.__swap_tiles(tile1, tile2)
             mms = self.board.calculate_matches_for([tile1, tile2])
 
             # Restore the positions after the calculation
-            swap_tiles(tile1, tile2)
+            self.__swap_tiles(tile1, tile2)
 
             # Only moves that create matches are allowed
             if mms is None:
@@ -220,7 +220,7 @@ class PlayState(BaseState):
                 tile2 = self.board.tiles[self.highlighted_i2][
                     self.highlighted_j2
                 ]
-                swap_tiles(tile1, tile2)
+                self.__swap_tiles(tile1, tile2)
                 self.__calculate_matches([tile1, tile2])
 
             # Swap tiles
