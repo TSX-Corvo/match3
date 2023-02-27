@@ -3,6 +3,9 @@
 
 # Assignment 4: Match-3
 
+## 1.2.0
+- Adjusted game mechanics: if there are no remaining matches after a move, the board will be randomized until there is a match somewhere on the board.
+
 ## 1.1.1
 - Only moves that create matches are allowed
 
