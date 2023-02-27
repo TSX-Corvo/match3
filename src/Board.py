@@ -23,7 +23,7 @@ class Board:
         self.y = y
         self.matches: List[List[Tile]] = []
         self.tiles: List[List[Tile]] = []
-        self.__initialize_tiles()
+        self.initialize_tiles()
 
     def render(self, surface: pygame.Surface) -> None:
         dragged: Tile = None
@@ -53,7 +53,7 @@ class Board:
             and self.tiles[i][j - 2].color
         )
 
-    def __initialize_tiles(self) -> None:
+    def initialize_tiles(self) -> None:
         self.tiles = [
             [None for _ in range(settings.BOARD_WIDTH)]
             for _ in range(settings.BOARD_HEIGHT)

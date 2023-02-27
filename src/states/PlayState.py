@@ -67,6 +67,10 @@ class PlayState(BaseState):
 
         InputHandler.register_listener(self)
 
+        # Avoid deadlocked board on start
+        while self.__check_deadlock():
+            self.board.initialize_tiles()
+
     def exit(self) -> None:
         InputHandler.unregister_listener(self)
 
@@ -138,6 +142,9 @@ class PlayState(BaseState):
     def on_input(self, input_id: str, input_data: InputData) -> None:
         if not self.active:
             return
+        
+        if input_id == "test" and input_data.pressed:
+            self.board.initialize_tiles()
 
         if input_id == "click" and input_data.pressed:
             pos_x, pos_y = input_data.position
@@ -166,10 +173,45 @@ class PlayState(BaseState):
             dragged_tile.is_dragged = False
             dragged_tile.restore_position()
 
+            # Trigger the swapping
             self.highlighted_i2 = i
             self.highlighted_j2 = j
             self.highlighted_tile = False
             self.__swap_highlighted_tiles()
+
+
+
+    def __check_deadlock(self) -> bool:
+        for row in range(settings.BOARD_HEIGHT - 1):
+            # As we are traversing from top to down, left to right, it's only necessary to check the
+            # tile to the right and the tile below the current one 
+
+            for col in range(settings.BOARD_WIDTH - 1):
+               
+                # Check right    
+                tile1 = self.board.tiles[row][col]
+                tile2 = self.board.tiles[row][col + 1]
+                self.__swap_tiles(tile1, tile2)
+                matches = self.board.calculate_matches_for([tile1, tile2])
+                self.__swap_tiles(tile1, tile2)
+
+                if matches:
+                    self.board.matches = []
+                    # print(f"({tile1.i+1};{tile1.j+1}) ({tile2.i+1};{tile2.j+1})")
+                    return False
+
+                # Check down
+                tile1 = self.board.tiles[row][col]
+                tile2 = self.board.tiles[row + 1][col]
+                self.__swap_tiles(tile1, tile2)
+                matches = self.board.calculate_matches_for([tile1, tile2])
+                self.__swap_tiles(tile1, tile2)
+
+                if matches:
+                    self.board.matches = []
+                    # print(f"({tile1.i+1};{tile1.j+1}) ({tile2.i+1};{tile2.j+1})")
+                    return False
+        return True
 
 
     def __swap_tiles(self, tile1, tile2) -> None:
@@ -199,7 +241,6 @@ class PlayState(BaseState):
             tile2 = self.board.tiles[self.highlighted_i2][
                 self.highlighted_j2
             ]
-
         
             # Check beforehand if match will be generated
             self.__swap_tiles(tile1, tile2)
@@ -222,6 +263,14 @@ class PlayState(BaseState):
                 ]
                 self.__swap_tiles(tile1, tile2)
                 self.__calculate_matches([tile1, tile2])
+                # Check for deadlock after the move
+                def resolve_deadlock():
+                    self.active = False
+                    while self.__check_deadlock():
+                        self.board.initialize_tiles()
+                    self.active = True
+
+                Timer.after(1, resolve_deadlock)
 
             # Swap tiles
             Timer.tween(
