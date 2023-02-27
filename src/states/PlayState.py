@@ -18,6 +18,9 @@ from gale.timer import Timer
 
 import settings
 
+from src.PowerUp import PowerUp
+from src.Bomb4 import Bomb4
+
 
 class PlayState(BaseState):
     def enter(self, **enter_params: Dict[str, Any]) -> None:
@@ -144,7 +147,9 @@ class PlayState(BaseState):
             return
         
         if input_id == "test" and input_data.pressed:
-            self.board.initialize_tiles()
+            tile = self.board.tiles[0][0]
+            replacement = Bomb4(tile.i, tile.j, tile.color, tile.variety)
+            self.board.tiles[0][0] = replacement
 
         if input_id == "click" and input_data.pressed:
             pos_x, pos_y = input_data.position
@@ -154,6 +159,9 @@ class PlayState(BaseState):
             j = (pos_x - self.board.x) // settings.TILE_SIZE
 
             if 0 <= i < settings.BOARD_HEIGHT and 0 <= j <= settings.BOARD_WIDTH:
+                if isinstance(self.board.tiles[i][j], PowerUp):
+                    self.board.tiles[i][j].take(self)
+
                 if not self.highlighted_tile:
                     self.highlighted_i1 = i
                     self.highlighted_j1 = j
