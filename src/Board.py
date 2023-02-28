@@ -14,7 +14,7 @@ import pygame
 import random
 
 import settings
-from src.Tile import Tile
+from src.PowerUp import Tile, PowerUp
 
 
 class Board:
@@ -136,6 +136,13 @@ class Board:
         for t in match:
             match += self.__calculate_match_rec(t)
 
+        if isinstance(tile, PowerUp):
+            p_matches = tile.take(self)
+            for t in p_matches:
+                if t not in self.in_match:
+                    self.in_match.add(t)
+                    match.append(t)
+            
         self.in_stack.remove(tile)
         return match
 

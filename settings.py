@@ -23,6 +23,7 @@ input_handler.InputHandler.set_keyboard_action(input_handler.KEY_RETURN, "enter"
 input_handler.InputHandler.set_keyboard_action(input_handler.KEY_UP, "up")
 input_handler.InputHandler.set_keyboard_action(input_handler.KEY_DOWN, "down")
 input_handler.InputHandler.set_mouse_click_action(input_handler.MOUSE_BUTTON_1, "click")
+input_handler.InputHandler.set_mouse_click_action(input_handler.MOUSE_BUTTON_3, "right_click")
 input_handler.InputHandler.set_keyboard_action(input_handler.KEY_f, "test")
 
 WINDOW_WIDTH = 1280

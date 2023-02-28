@@ -1,14 +1,32 @@
-from typing import TypeVar
+from typing import TypeVar, List
 import pygame
 
 import settings
 
-from src.PowerUp import PowerUp
+from src.PowerUp import PowerUp, Tile
 
 
 class Bomb4(PowerUp):
-    def take(self, play_state: TypeVar("PlayState")) -> None:
-        print("Took Bomb4!")
+    def take(self, board: TypeVar("Board")) -> List[Tile]:
+        # Add self and neighbors to the play state matches
+        tiles = board.tiles
+        
+        match = []
+
+        if not self in match:
+            match.append(self)
+
+        if self.i > 0:
+            match.append(tiles[self.i - 1][self.j])
+        if self.i < settings.BOARD_HEIGHT - 1:
+            match.append(tiles[self.i + 1][self.j])
+        if self.j > 0:
+            match.append(tiles[self.i][self.j - 1])
+        if self.j < settings.BOARD_WIDTH - 1:
+            match.append(tiles[self.i][self.j + 1])
+
+        return match
+       
 
     def render(self, surface: pygame.Surface, offset_x: int, offset_y: int) -> None:
         super().render(surface, offset_x, offset_y)

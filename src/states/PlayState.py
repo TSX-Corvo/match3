@@ -151,6 +151,18 @@ class PlayState(BaseState):
             replacement = Bomb4(tile.i, tile.j, tile.color, tile.variety)
             self.board.tiles[0][0] = replacement
 
+        if input_id == "right_click" and input_data.pressed:
+            pos_x, pos_y = input_data.position
+            pos_x = pos_x * settings.VIRTUAL_WIDTH // settings.WINDOW_WIDTH
+            pos_y = pos_y * settings.VIRTUAL_HEIGHT // settings.WINDOW_HEIGHT
+            i = (pos_y - self.board.y) // settings.TILE_SIZE
+            j = (pos_x - self.board.x) // settings.TILE_SIZE
+
+            if 0 <= i < settings.BOARD_HEIGHT and 0 <= j <= settings.BOARD_WIDTH:                
+                tile = self.board.tiles[i][j]
+                replacement = Bomb4(tile.i, tile.j, tile.color, tile.variety)
+                self.board.tiles[i][j] = replacement
+
         if input_id == "click" and input_data.pressed:
             pos_x, pos_y = input_data.position
             pos_x = pos_x * settings.VIRTUAL_WIDTH // settings.WINDOW_WIDTH
@@ -159,8 +171,40 @@ class PlayState(BaseState):
             j = (pos_x - self.board.x) // settings.TILE_SIZE
 
             if 0 <= i < settings.BOARD_HEIGHT and 0 <= j <= settings.BOARD_WIDTH:
+                # if we click a Powerup...
                 if isinstance(self.board.tiles[i][j], PowerUp):
-                    self.board.tiles[i][j].take(self)
+                    settings.SOUNDS["match"].stop()
+                    settings.SOUNDS["match"].play()
+
+                    # Let the powerup add the matches it needs
+                    p_matches = self.board.tiles[i][j].take(self.board)
+
+                    self.board.matches.append(p_matches)
+
+                    # Add relevant score
+                    self.score += len(p_matches) * 50
+
+                     # Delete them like a regular match
+                    self.board.remove_matches()
+
+                    falling_tiles = self.board.get_falling_tiles()
+
+                    def resolve_deadlock():
+                        self.__calculate_matches(
+                            [item[0] for item in falling_tiles])
+                        self.active = False
+                        while self.__check_deadlock():
+                            self.board.initialize_tiles()
+                        self.active = True
+
+                    Timer.tween(
+                        0.25,
+                        falling_tiles,
+                        on_finish=resolve_deadlock,
+                    )
+
+                    return
+
 
                 if not self.highlighted_tile:
                     self.highlighted_i1 = i
