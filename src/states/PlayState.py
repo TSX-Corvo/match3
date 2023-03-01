@@ -41,7 +41,7 @@ class PlayState(BaseState):
 
         self.timer = settings.LEVEL_TIME
 
-        self.goal_score = self.level * 1.25 * 10000
+        self.goal_score = self.level * 1.25 * 1000
 
         # A surface that supports alpha to highlight a selected tile
         self.tile_alpha_surface = pygame.Surface(
@@ -146,19 +146,6 @@ class PlayState(BaseState):
     def on_input(self, input_id: str, input_data: InputData) -> None:
         if not self.active:
             return
-
-        if input_id == "right_click" and input_data.pressed:
-            pos_x, pos_y = input_data.position
-            pos_x = pos_x * settings.VIRTUAL_WIDTH // settings.WINDOW_WIDTH
-            pos_y = pos_y * settings.VIRTUAL_HEIGHT // settings.WINDOW_HEIGHT
-            i = (pos_y - self.board.y) // settings.TILE_SIZE
-            j = (pos_x - self.board.x) // settings.TILE_SIZE
-
-            if 0 <= i < settings.BOARD_HEIGHT and 0 <= j <= settings.BOARD_WIDTH:                
-                # tile = self.board.tiles[i][j]
-                # replacement = Bomb4(tile.i, tile.j, tile.color, tile.variety)
-                # self.board.tiles[i][j] = replacement
-                self.board.tiles[i][j].color = 0
 
         if input_id == "click" and input_data.pressed:
             pos_x, pos_y = input_data.position
