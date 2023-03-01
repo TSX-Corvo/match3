@@ -20,6 +20,7 @@ import settings
 
 from src.PowerUp import PowerUp
 from src.Bomb4 import Bomb4
+from src.Bomb5 import Bomb5
 
 
 class PlayState(BaseState):
@@ -348,7 +349,8 @@ class PlayState(BaseState):
             generated_by = match[-1]
             if len(match) >=5:
                 #generate Bomb5
-                pass
+                p = Bomb5(generated_by.i, generated_by.j, generated_by.color, generated_by.variety)
+                powerups.append(p)
             elif len(match) >= 4:
                 p = Bomb4(generated_by.i, generated_by.j, generated_by.color, generated_by.variety)
                 powerups.append(p)
