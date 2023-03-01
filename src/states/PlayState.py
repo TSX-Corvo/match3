@@ -7,7 +7,7 @@ alejandro.j.mujic4@gmail.com
 
 This file contains the class PlayState.
 """
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 
 import pygame
 
@@ -40,7 +40,7 @@ class PlayState(BaseState):
 
         self.timer = settings.LEVEL_TIME
 
-        self.goal_score = self.level * 1.25 * 1000
+        self.goal_score = self.level * 1.25 * 10000
 
         # A surface that supports alpha to highlight a selected tile
         self.tile_alpha_surface = pygame.Surface(
@@ -340,17 +340,33 @@ class PlayState(BaseState):
         settings.SOUNDS["match"].stop()
         settings.SOUNDS["match"].play()
 
+        powerups: List[PowerUp] = []
+
         for match in matches:
+            # verify matches to see which ones generate powerups
+            generated_by = match[-1]
+            if len(match) >=5:
+                #generate Bomb5
+                pass
+            elif len(match) >= 4:
+                p = Bomb4(generated_by.i, generated_by.j, generated_by.color, generated_by.variety)
+                powerups.append(p)
+
             self.score += len(match) * 50
 
-        self.board.remove_matches()
+        self.board.remove_matches()       
 
         falling_tiles = self.board.get_falling_tiles()
+
+        def after_fall():
+            self.__calculate_matches(
+                [item[0] for item in falling_tiles]
+            )
+            for p in powerups:
+                self.board.tiles[p.i][p.j] = p
 
         Timer.tween(
             0.25,
             falling_tiles,
-            on_finish=lambda: self.__calculate_matches(
-                [item[0] for item in falling_tiles]
-            ),
+            on_finish=after_fall,
         )
