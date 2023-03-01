@@ -146,6 +146,16 @@ class PlayState(BaseState):
     def on_input(self, input_id: str, input_data: InputData) -> None:
         if not self.active:
             return
+        
+        if input_id == "right_click" and input_data.pressed:
+            pos_x, pos_y = input_data.position
+            pos_x = pos_x * settings.VIRTUAL_WIDTH // settings.WINDOW_WIDTH
+            pos_y = pos_y * settings.VIRTUAL_HEIGHT // settings.WINDOW_HEIGHT
+            i = (pos_y - self.board.y) // settings.TILE_SIZE
+            j = (pos_x - self.board.x) // settings.TILE_SIZE
+
+            if 0 <= i < settings.BOARD_HEIGHT and 0 <= j <= settings.BOARD_WIDTH:
+                self.board.tiles[i][j].color = 0
 
         if input_id == "click" and input_data.pressed:
             pos_x, pos_y = input_data.position
@@ -334,13 +344,22 @@ class PlayState(BaseState):
         for match in matches:
             # verify matches to see which ones generate powerups
             generated_by = match[-1]
-            if len(match) >=5:
-                #generate Bomb5
-                p = Bomb5(generated_by.i, generated_by.j, generated_by.color, generated_by.variety)
-                powerups.append(p)
-            elif len(match) >= 4:
-                p = Bomb4(generated_by.i, generated_by.j, generated_by.color, generated_by.variety)
-                powerups.append(p)
+
+            match_is_adjacent = True
+            for k in range(len(match) - 1):
+                if match[k].i != match[k+1].i and match[k].j != match[k+1].j:
+                    match_is_adjacent = False
+                    break
+
+            if match_is_adjacent:
+                # Generate powerups
+
+                if len(match) == 5:
+                    p = Bomb5(generated_by.i, generated_by.j, generated_by.color, generated_by.variety)
+                    powerups.append(p)
+                elif len(match) == 4:
+                    p = Bomb4(generated_by.i, generated_by.j, generated_by.color, generated_by.variety)
+                    powerups.append(p)
 
             self.score += len(match) * 50
 
