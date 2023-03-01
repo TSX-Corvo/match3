@@ -293,6 +293,7 @@ class PlayState(BaseState):
             # Check beforehand if match will be generated
             self.__swap_tiles(tile1, tile2)
             mms = self.board.calculate_matches_for([tile1, tile2])
+            self.board.matches = []
 
             # Restore the positions after the calculation
             self.__swap_tiles(tile1, tile2)
